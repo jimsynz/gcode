@@ -5,15 +5,17 @@ defmodule Gcode.Model.Comment.SerialiseTest do
 
   describe "serialise/1" do
     test "each line of the comment is wrapped in brackets" do
-      {:ok, actual} =
-        """
-        This
-        is
-        a
-        test
-        """
-        |> Comment.init()
-        |> Serialise.serialise()
+      comment = """
+      This
+      is
+      a
+      test
+      """
+
+      actual =
+        with {:ok, comment} <- Comment.init(comment),
+             {:ok, comment} <- Serialise.serialise(comment),
+             do: comment
 
       expected = ~w[(This) (is) (a) (test)]
 

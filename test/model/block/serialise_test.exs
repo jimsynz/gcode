@@ -7,10 +7,10 @@ defmodule Gcode.Model.Block.SerialiseTest do
   describe "serialise/1" do
     assert ok(block) =
              with(
-               block <- Block.init(),
-               word <- Word.init("G", 0),
+               ok(block) <- Block.init(),
+               ok(word) <- Word.init("G", 0),
                ok(block) <- Block.push(block, word),
-               word <- Word.init("N", 100),
+               ok(word) <- Word.init("N", 100),
                ok(block) <- Block.push(block, word),
                do: ok(block)
              )

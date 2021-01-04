@@ -19,10 +19,10 @@ defmodule Gcode.Model.Block do
   ## Example
 
       iex> Block.init()
-      %Block{words: [], comment: none()}
+      {:ok, %Block{words: [], comment: none()}}
   """
-  @spec init :: t
-  def init, do: %Block{words: [], comment: none()}
+  @spec init :: Result.t(t)
+  def init, do: ok(%Block{words: [], comment: none()})
 
   @doc """
   Set a comment on the block (this is just a sugar to make sure that the comment
@@ -32,14 +32,14 @@ defmodule Gcode.Model.Block do
 
   ## Examples
 
-      iex> comment = Comment.init("Jen, in the swing seat, with her night terrors")
-      ...> block = Block.init()
+      iex> {:ok, comment} = Comment.init("Jen, in the swing seat, with her night terrors")
+      ...> {:ok, block} = Block.init()
       ...> {:ok, block} = Block.comment(block, comment)
       ...> Result.ok?(block.comment)
       true
 
-      iex> comment = Comment.init("Jen, in the swing seat, with her night terrors")
-      ...> block = Block.init()
+      iex> {:ok, comment} = Comment.init("Jen, in the swing seat, with her night terrors")
+      ...> {:ok, block} = Block.init()
       ...> {:ok, block} = Block.comment(block, comment)
       ...> Block.comment(block, comment)
       {:error, {:block_error, "Block already contains a comment"}}
@@ -61,12 +61,14 @@ defmodule Gcode.Model.Block do
 
   ## Example
 
-      iex> block = Block.init()
-      ...> {:ok, block} = Block.push(block, Word.init("G", 0))
-      ...> Block.push(block, Word.init("N", 100))
-      {:ok, %Block{words: [Word.init("N", 100), Word.init("G", 0)]}}
+      iex> {:ok, block} = Block.init()
+      ...> {:ok, word} = Word.init("G", 0)
+      ...> {:ok, block} = Block.push(block, word)
+      ...> {:ok, word} = Word.init("N", 100)
+      ...> Block.push(block, word)
+      {:ok, %Block{words: [%Word{word: some("N"), address: some(100)}, %Word{word: some("G"), address: some(0)}]}}
   """
-  @spec push(t, Word.t()) :: Result.t(t, block_error)
+  @spec push(t, block_contents) :: Result.t(t, block_error)
   def push(%Block{words: words} = block, word)
       when (is_struct(word, Word) or is_struct(word, Skip)) and is_list(words),
       do: {:ok, %Block{block | words: [word | words]}}
@@ -81,13 +83,15 @@ defmodule Gcode.Model.Block do
   @doc """
   An accessor which returns the block's words in the correct order.
 
-      iex> block = Block.init()
-      ...> {:ok, block} = Block.push(block, Word.init("G", 0))
-      ...> {:ok, block} = Block.push(block, Word.init("N", 100))
+      iex> {:ok, block} = Block.init()
+      ...> {:ok, word} = Word.init("G", 0)
+      ...> {:ok, block} = Block.push(block, word)
+      ...> {:ok, word} = Word.init("N", 100)
+      ...> {:ok, block} = Block.push(block, word)
       ...> Block.words(block)
-      {:ok, [Word.init("G", 0), Word.init("N", 100)]}
+      {:ok, [%Word{word: some("G"), address: some(0)}, %Word{word: some("N"), address: some(100)}]}
   """
-  @spec words(t) :: Result.t([Word.t()], {:block_error, String.t()})
+  @spec words(t) :: Result.t([Word.t()], block_error)
   def words(%Block{words: words}) when is_list(words), do: {:ok, Enum.reverse(words)}
 
   def words(%Block{words: words}),

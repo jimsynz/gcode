@@ -1,6 +1,7 @@
 defmodule Gcode.Model.Skip do
   alias Gcode.Model.Skip
   use Gcode.Option
+  use Gcode.Result
   defstruct number: Option.none()
 
   @moduledoc """
@@ -11,6 +12,8 @@ defmodule Gcode.Model.Skip do
           number: Option.t(non_neg_integer)
         }
 
+  @type error :: {:skip_error, String.t()}
+
   @doc """
   Initialise a skip with a number.
 
@@ -18,10 +21,14 @@ defmodule Gcode.Model.Skip do
 
       iex> 13
       ...> |> Skip.init()
-      %Skip{number: some(13)}
+      {:ok, %Skip{number: some(13)}}
   """
-  @spec init(non_neg_integer) :: t
-  def init(number) when is_number(number) and number >= 0, do: %Skip{number: Option.some(number)}
+  @spec init(non_neg_integer) :: Result.t(t, error)
+  def init(number) when is_integer(number) and number >= 0,
+    do: ok(%Skip{number: Option.some(number)})
+
+  def init(number),
+    do: error({:skip_error, "Expected a positive integer, received #{inspect(number)}"})
 
   @doc """
   Initialise a skip without a number.
@@ -29,8 +36,8 @@ defmodule Gcode.Model.Skip do
   ## Example
 
       iex> Skip.init()
-      %Skip{number: none()}
+      {:ok, %Skip{number: none()}}
   """
-  @spec init :: t
-  def init, do: %Skip{}
+  @spec init :: Result.t(t)
+  def init, do: ok(%Skip{})
 end

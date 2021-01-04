@@ -1,6 +1,7 @@
 defmodule Gcode.Model.Comment do
   alias Gcode.Model.Comment
   use Gcode.Option
+  use Gcode.Result
   defstruct comment: Option.none()
 
   @moduledoc """
@@ -11,6 +12,8 @@ defmodule Gcode.Model.Comment do
           comment: Option.t(String.t())
         }
 
+  @type error :: {:comment_error, String.t()}
+
   @doc """
   Initialise a comment.
 
@@ -18,8 +21,24 @@ defmodule Gcode.Model.Comment do
 
       iex> "Doc, in the carpark, with plutonium"
       ...> |> Comment.init()
-      %Comment{comment: some("Doc, in the carpark, with plutonium")}
+      {:ok, %Comment{comment: some("Doc, in the carpark, with plutonium")}}
   """
-  @spec init(String.t()) :: t
-  def init(comment) when is_binary(comment), do: %Comment{comment: Option.some(comment)}
+  @spec init(String.t()) :: Result.t(t, error)
+  def init(comment) when is_binary(comment) do
+    if String.printable?(comment) do
+      ok(%Comment{comment: some(comment)})
+    else
+      error(
+        {:comment_error,
+         "Expected comment should be a valid UTF-8 string, received #{inspect(comment)}"}
+      )
+    end
+  end
+
+  def init(comment),
+    do:
+      error(
+        {:comment_error,
+         "Expected comment should be a valid UTF-8 string, received #{inspect(comment)}"}
+      )
 end
