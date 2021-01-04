@@ -14,7 +14,8 @@ defmodule Gcode.MixProject do
       start_permanent: Mix.env() == :prod,
       package: package(),
       description: @description,
-      deps: deps()
+      deps: deps(),
+      consolidate_protocols: Mix.env() != :test
     ]
   end
 
