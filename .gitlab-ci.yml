@@ -79,7 +79,7 @@ pages:
     paths:
       - public
   only:
-    - $CI_DEFAULT_BRANCH
+    - main
 
 git_ops:
   image: elixir:latest
@@ -87,7 +87,7 @@ git_ops:
     - build
   stage: release
   only:
-    - $CI_DEFAULT_BRANCH
+    - main
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /chore\:\ release version/
