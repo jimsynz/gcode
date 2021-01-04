@@ -87,8 +87,7 @@ git_ops:
     - build
   stage: release
   only:
-    refs:
-      - $CI_DEFAULT_BRANCH
+    - $CI_DEFAULT_BRANCH
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /chore\:\ release version/
