@@ -10,7 +10,7 @@ by adding `gcode` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:gcode, "~> 0.1.0"}
+    {:gcode, "~> 0.2.0"}
   ]
 end
 ```
