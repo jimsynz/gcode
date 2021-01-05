@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.3.0](https://gitlab.com/jimsy/gcode/compare/v0.2.1...v0.3.0) (2021-01-05)
+
+
+
+
+### Features:
+
+* descriptions: Add human-readable descriptions of commonly used codes.
+
 ## [v0.2.1](https://gitlab.com/jimsy/gcode/compare/v0.2.0...v0.2.1) (2021-01-04)
 
 
