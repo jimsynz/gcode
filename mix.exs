@@ -1,5 +1,6 @@
 defmodule Gcode.MixProject do
   use Mix.Project
+  @moduledoc false
 
   @version "0.2.1"
   @description """
@@ -15,7 +16,8 @@ defmodule Gcode.MixProject do
       package: package(),
       description: @description,
       deps: deps(),
-      consolidate_protocols: Mix.env() != :test
+      consolidate_protocols: Mix.env() != :test,
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
 
@@ -45,4 +47,7 @@ defmodule Gcode.MixProject do
       {:git_ops, "~> 2.3", only: ~w[dev test]a, runtime: false}
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 end

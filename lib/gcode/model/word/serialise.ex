@@ -4,11 +4,11 @@ defimpl Gcode.Model.Serialise, for: Gcode.Model.Word do
   use Gcode.Result
 
   @spec serialise(Word.t()) :: Result.t([String.t()], {:serialise_error, any})
-  def serialise(%Word{word: some(word), address: some(address)}) when is_integer(address) do
+  def serialise(%Word{word: word, address: address}) when is_integer(address) do
     ok(["#{word}#{address}"])
   end
 
-  def serialise(%Word{word: some(word), address: some(address)}) when is_float(address) do
+  def serialise(%Word{word: word, address: address}) when is_float(address) do
     ok(["#{word}#{address}"])
   end
 

@@ -9,7 +9,7 @@ defmodule Gcode.Model.Comment do
   """
 
   @type t :: %Comment{
-          comment: Option.t(String.t())
+          comment: String.t()
         }
 
   @type error :: {:comment_error, String.t()}
@@ -21,12 +21,12 @@ defmodule Gcode.Model.Comment do
 
       iex> "Doc, in the carpark, with plutonium"
       ...> |> Comment.init()
-      {:ok, %Comment{comment: some("Doc, in the carpark, with plutonium")}}
+      {:ok, %Comment{comment: "Doc, in the carpark, with plutonium"}}
   """
   @spec init(String.t()) :: Result.t(t, error)
   def init(comment) when is_binary(comment) do
     if String.printable?(comment) do
-      ok(%Comment{comment: some(comment)})
+      ok(%Comment{comment: comment})
     else
       error(
         {:comment_error,

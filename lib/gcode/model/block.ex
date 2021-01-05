@@ -46,7 +46,7 @@ defmodule Gcode.Model.Block do
 
   """
   @spec comment(t, Comment.t()) :: Result.t(t, block_error)
-  def comment(%Block{comment: none()} = block, %Comment{comment: some(_)} = comment),
+  def comment(%Block{comment: none()} = block, %Comment{} = comment),
     do: {:ok, %Block{block | comment: some(comment)}}
 
   def comment(%Block{comment: some(_)}, _comment),
@@ -66,7 +66,7 @@ defmodule Gcode.Model.Block do
       ...> {:ok, block} = Block.push(block, word)
       ...> {:ok, word} = Word.init("N", 100)
       ...> Block.push(block, word)
-      {:ok, %Block{words: [%Word{word: some("N"), address: some(100)}, %Word{word: some("G"), address: some(0)}]}}
+      {:ok, %Block{words: [%Word{word: "N", address: 100}, %Word{word: "G", address: 0}]}}
   """
   @spec push(t, block_contents) :: Result.t(t, block_error)
   def push(%Block{words: words} = block, word)
@@ -89,7 +89,7 @@ defmodule Gcode.Model.Block do
       ...> {:ok, word} = Word.init("N", 100)
       ...> {:ok, block} = Block.push(block, word)
       ...> Block.words(block)
-      {:ok, [%Word{word: some("G"), address: some(0)}, %Word{word: some("N"), address: some(100)}]}
+      {:ok, [%Word{word: "G", address: 0}, %Word{word: "N", address: 100}]}
   """
   @spec words(t) :: Result.t([Word.t()], block_error)
   def words(%Block{words: words}) when is_list(words), do: {:ok, Enum.reverse(words)}

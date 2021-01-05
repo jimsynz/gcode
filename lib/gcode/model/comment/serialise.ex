@@ -4,7 +4,7 @@ defimpl Gcode.Model.Serialise, for: Gcode.Model.Comment do
   use Gcode.Result
 
   @spec serialise(Comment.t()) :: Result.t([String.t()], {:serialise_error, any})
-  def serialise(%Comment{comment: some(comment)}) do
+  def serialise(%Comment{comment: comment}) when is_binary(comment) do
     comment
     |> String.split(~r/(\r\n|\r|\n)/)
     |> Enum.reject(&(byte_size(&1) == 0))
@@ -12,5 +12,5 @@ defimpl Gcode.Model.Serialise, for: Gcode.Model.Comment do
     |> ok()
   end
 
-  def serialise(%Comment{comment: none()}), do: {:error, {:serialise_error, :empty_comment}}
+  def serialise(_comment), do: {:error, {:serialise_error, "Invalid comment"}}
 end

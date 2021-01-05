@@ -1,4 +1,5 @@
 defprotocol Gcode.Model.Serialise do
+  alias Gcode.Model.Serialise
   alias Gcode.Result
 
   @moduledoc """
@@ -6,5 +7,5 @@ defprotocol Gcode.Model.Serialise do
   """
 
   @spec serialise(Serialise.t()) :: Result.t([String.t()])
-  def serialise(value)
+  def serialise(serialisable)
 end

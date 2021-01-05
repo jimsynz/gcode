@@ -10,8 +10,8 @@ defmodule Gcode.Model.Word do
   """
 
   @type t :: %Word{
-          word: Option.some(String.t()),
-          address: Option.some(number)
+          word: String.t(),
+          address: number
         }
 
   @doc """
@@ -20,12 +20,12 @@ defmodule Gcode.Model.Word do
   ## Example
 
       iex> Word.init("G", 0)
-      {:ok, %Word{word: {:ok, "G"}, address: {:ok, 0}}}
+      {:ok, %Word{word: "G", address: 0}}
   """
   @spec init(String.t(), number) :: Result.t(t)
   def init(word, address) when is_binary(word) and is_number(address) do
     if Regex.match?(~r/^[A-Z]$/, word) do
-      ok(%Word{word: some(word), address: some(address)})
+      ok(%Word{word: word, address: address})
     else
       error({:word_error, "Expected word to be a single character, received #{inspect(word)}"})
     end

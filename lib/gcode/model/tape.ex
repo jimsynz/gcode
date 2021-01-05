@@ -1,5 +1,5 @@
 defmodule Gcode.Model.Tape do
-  defstruct leader: :none
+  defstruct leader: :error
   alias Gcode.{Model.Tape}
   use Gcode.Option
   use Gcode.Result
@@ -18,7 +18,7 @@ defmodule Gcode.Model.Tape do
   ## Example
 
       iex> Tape.init()
-      {:ok, %Tape{leader: :none}}
+      {:ok, %Tape{leader: :error}}
   """
   @spec init :: Result.t(t)
   def init, do: ok(%Tape{leader: Option.none()})
