@@ -3,6 +3,11 @@ defimpl Gcode.Model.Serialise, for: Gcode.Model.Comment do
   use Gcode.Option
   use Gcode.Result
 
+  @moduledoc """
+  Implements the `Serialise` protocol for `Comment`, allowing it to be turned
+  into G-code output.
+  """
+
   @spec serialise(Comment.t()) :: Result.t([String.t()], {:serialise_error, any})
   def serialise(%Comment{comment: comment}) when is_binary(comment) do
     comment

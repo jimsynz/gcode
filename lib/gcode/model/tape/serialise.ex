@@ -2,7 +2,11 @@ defimpl Gcode.Model.Serialise, for: Gcode.Model.Tape do
   alias Gcode.{Model.Tape, Result}
   use Gcode.Option
   use Gcode.Result
-  @moduledoc false
+
+  @moduledoc """
+  Implements the `Serialise` protocol for `Tape`, allowing it to be turned into
+  G-code output.
+  """
 
   @spec serialise(Tape.t()) :: Result.t([String.t()], {:serialise_error, any})
   def serialise(%Tape{leader: none()}), do: ok(["%"])

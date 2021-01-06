@@ -1,7 +1,10 @@
 defimpl Gcode.Model.Describe, for: Gcode.Model.Word do
+  import Gcode.Model.Expr.Helpers
   use Gcode.Option
   use Gcode.Result
-  alias Gcode.Model.Word
+  alias Gcode.Model.{Expr, Word}
+
+  # credo:disable-for-this-file Credo.Check.Refactor.CyclomaticComplexity
 
   @moduledoc """
   Describes common/conventional words.
@@ -49,283 +52,560 @@ defimpl Gcode.Model.Describe, for: Gcode.Model.Word do
     do: do_describe(word, Enum.into(options, %{}))
 
   defp do_describe(%Word{word: axis, address: angle}, %{positioning: :absolute})
-       when axis in ~w[A B C] and angle >= 0,
-       do: some("Rotate #{axis} axis counterclockwise to #{angle}º")
+       when axis in ~w[A B C] do
+    case Expr.evaluate(angle) do
+      ok(angle) when is_number(angle) and angle >= 0 ->
+        some("Rotate #{axis} axis counterclockwise to #{angle}º")
+
+      ok(angle) when is_number(angle) and angle < 0 ->
+        some("Rotate #{axis} axis clockwise to #{abs(angle)}º")
+
+      error(_) ->
+        none()
+    end
+  end
 
   defp do_describe(%Word{word: axis, address: angle}, %{positioning: :relative})
-       when axis in ~w[A B C] and angle >= 0,
-       do: some("Rotate #{axis} axis counterclockwise by #{angle}º")
+       when axis in ~w[A B C] do
+    case Expr.evaluate(angle) do
+      ok(angle) when is_number(angle) and angle >= 0 ->
+        some("Rotate #{axis} axis counterclockwise by #{angle}º")
+
+      ok(angle) when is_number(angle) and angle < 0 ->
+        some("Rotate #{axis} axis clockwise by #{abs(angle)}º")
+
+      error(_) ->
+        none()
+    end
+  end
 
   defp do_describe(%Word{word: axis, address: angle}, _)
-       when axis in ~w[A B C] and angle >= 0,
-       do: some("Rotate #{axis} axis counterclockwise by/to #{angle}º")
-
-  defp do_describe(%Word{word: axis, address: angle}, %{positioning: :absolute})
-       when axis in ~w[A B C] and angle < 0,
-       do: some("Rotate #{axis} axis clockwise to #{abs(angle)}º")
-
-  defp do_describe(%Word{word: axis, address: angle}, %{positioning: :relative})
-       when axis in ~w[A B C] and angle < 0,
-       do: some("Rotate #{axis} axis clockwise by #{abs(angle)}º")
-
-  defp do_describe(%Word{word: axis, address: angle}, _)
-       when axis in ~w[A B C] and angle < 0,
-       do: some("Rotate #{axis} axis clockwise by/to #{abs(angle)}º")
-
-  defp do_describe(%Word{word: "D", address: depth}, %{operation: :turning} = options),
-    do: some("Depth of cut #{distance_with_unit(depth, options)}")
-
-  defp do_describe(%Word{word: "D", address: aperture}, %{operation: :plotting}),
-    do: some("Aperture #{aperture}")
+       when axis in ~w[A B C] do
+    case Expr.evaluate(angle) do
+      ok(angle) when is_number(angle) and angle >= 0 ->
+        some("Rotate #{axis} axis counterclockwise by/to #{angle}º")
+
+      ok(angle) when is_number(angle) and angle < 0 ->
+        some("Rotate #{axis} axis clockwise by/to #{abs(angle)}º")
+
+      error(_) ->
+        none()
+    end
+  end
+
+  defp do_describe(%Word{word: "D", address: depth}, %{operation: :turning} = options) do
+    case distance_with_unit(depth, options) do
+      some(depth) ->
+        some("Depth of cut #{depth}")
+
+      _ ->
+        none()
+    end
+  end
+
+  defp do_describe(%Word{word: "D", address: aperture}, %{operation: :plotting}) do
+    case Expr.evaluate(aperture) do
+      some(aperture) when is_number(aperture) -> some("Aperture #{aperture}")
+      _ -> none()
+    end
+  end
+
+  defp do_describe(%Word{word: "D", address: offset}, %{compensation: :left} = options) do
+    case distance_with_unit(offset, options) do
+      some(offset) -> some("Left radial offset #{offset}")
+      _ -> none()
+    end
+  end
+
+  defp do_describe(%Word{word: "D", address: offset}, %{compensation: :right} = options) do
+    case distance_with_unit(offset, options) do
+      some(offset) -> some("Right radial offset #{offset}")
+      _ -> none()
+    end
+  end
+
+  defp do_describe(%Word{word: "D", address: offset}, options) do
+    case distance_with_unit(offset, options) do
+      some(offset) -> some("Radial offset #{offset}")
+      _ -> none()
+    end
+  end
+
+  defp do_describe(%Word{word: "E", address: feedrate}, %{operation: :printing} = options) do
+    case feedrate(feedrate, options) do
+      some(feedrate) -> some("Extruder feedrate #{feedrate}")
+      _ -> none()
+    end
+  end
+
+  defp do_describe(%Word{word: "E", address: feedrate}, %{operation: :turning} = options) do
+    case feedrate(feedrate, options) do
+      some(feedrate) -> some("Precision feedrate #{feedrate}")
+      _ -> none()
+    end
+  end
 
-  defp do_describe(%Word{word: "D", address: offset}, %{compensation: :left} = options),
-    do: some("Left radial offset #{distance_with_unit(offset, options)}")
+  defp do_describe(%Word{word: "F", address: feedrate}, options) do
+    case feedrate(feedrate, options) do
+      some(feedrate) -> some("Feedrate #{feedrate}")
+      _ -> none()
+    end
+  end
 
-  defp do_describe(%Word{word: "D", address: offset}, %{compensation: :right} = options),
-    do: some("Right radial offset #{distance_with_unit(offset, options)}")
+  defp do_describe(%Word{word: "G", address: address}, options) do
+    case {Expr.evaluate(address), options} do
+      {ok(0), _} ->
+        some("Rapid move")
 
-  defp do_describe(%Word{word: "D", address: offset}, options),
-    do: some("Radial offset #{distance_with_unit(offset, options)}")
+      {ok(1), _} ->
+        some("Linear move")
 
-  defp do_describe(%Word{word: "E", address: feedrate}, %{operation: :printing} = options),
-    do: some("Extruder feedrate #{feedrate(feedrate, options)}")
+      {ok(2), _} ->
+        some("Clockwise circular move")
 
-  defp do_describe(%Word{word: "E", address: feedrate}, %{operation: :turning} = options),
-    do: some("Precision feedrate #{feedrate(feedrate, options)}")
+      {ok(3), _} ->
+        some("Counterclockwise circular move")
 
-  defp do_describe(%Word{word: "F", address: feedrate}, options),
-    do: some("Feedrate #{feedrate(feedrate, options)}")
+      {ok(4), _} ->
+        some("Dwell")
 
-  defp do_describe(%Word{word: "G", address: 0}, _), do: some("Rapid move")
-  defp do_describe(%Word{word: "G", address: 1}, _), do: some("Linear move")
-  defp do_describe(%Word{word: "G", address: 2}, _), do: some("Clockwise circular move")
-  defp do_describe(%Word{word: "G", address: 3}, _), do: some("Counterclockwise circular move")
-  defp do_describe(%Word{word: "G", address: 4}, _), do: some("Dwell")
-  defp do_describe(%Word{word: "G", address: 5}, _), do: some("High-precision contour control")
-  defp do_describe(%Word{word: "G", address: 5.1}, _), do: some("AI advanced preview control")
-  defp do_describe(%Word{word: "G", address: 6.1}, _), do: some("NURBS machining")
-  defp do_describe(%Word{word: "G", address: 7}, _), do: some("Imaginary axis designation")
-  defp do_describe(%Word{word: "G", address: 9}, _), do: some("Exact stop check - non-modal")
-  defp do_describe(%Word{word: "G", address: 10}, _), do: some("Programmable data input")
-  defp do_describe(%Word{word: "G", address: 11}, _), do: some("Data write cancel")
-  defp do_describe(%Word{word: "G", address: 17}, _), do: some("XY plane selection")
-  defp do_describe(%Word{word: "G", address: 18}, _), do: some("ZX plane selection")
-  defp do_describe(%Word{word: "G", address: 19}, _), do: some("YZ plane selection")
-  defp do_describe(%Word{word: "G", address: 20}, _), do: some("Unit is inches")
-  defp do_describe(%Word{word: "G", address: 21}, _), do: some("Unit is mm")
-  defp do_describe(%Word{word: "G", address: 28}, _), do: some("Return to home position")
+      {ok(5), _} ->
+        some("High-precision contour control")
 
-  defp do_describe(%Word{word: "G", address: 30}, _),
-    do: some("Return to secondary home position")
+      {ok(5.1), _} ->
+        some("AI advanced preview control")
 
-  defp do_describe(%Word{word: "G", address: 31}, _), do: some("Feed until skip function")
-  defp do_describe(%Word{word: "G", address: 32}, _), do: some("Single-point threading")
-  defp do_describe(%Word{word: "G", address: 33}, _), do: some("Variable pitch threading")
-  defp do_describe(%Word{word: "G", address: 40}, _), do: some("Tool radius compensation off")
-  defp do_describe(%Word{word: "G", address: 41}, _), do: some("Tool radius compensation left")
-  defp do_describe(%Word{word: "G", address: 42}, _), do: some("Tool radius compensation right")
+      {ok(6.1), _} ->
+        some("NURBS machining")
 
-  defp do_describe(%Word{word: "G", address: 43}, _),
-    do: some("Tool height offset compensation negative")
+      {ok(7), _} ->
+        some("Imaginary axis designation")
 
-  defp do_describe(%Word{word: "G", address: 44}, _),
-    do: some("Tool height offset compensation positive")
+      {ok(9), _} ->
+        some("Exact stop check - non-modal")
 
-  defp do_describe(%Word{word: "G", address: 45}, _), do: some("Axis offset single increase")
-  defp do_describe(%Word{word: "G", address: 46}, _), do: some("Axis offset single decrease")
-  defp do_describe(%Word{word: "G", address: 47}, _), do: some("Axis offset double increase")
-  defp do_describe(%Word{word: "G", address: 48}, _), do: some("Axis offset double decrease")
+      {ok(10), _} ->
+        some("Programmable data input")
 
-  defp do_describe(%Word{word: "G", address: 49}, _),
-    do: some("Tool length offset compensation cancel")
+      {ok(11), _} ->
+        some("Data write cancel")
 
-  defp do_describe(%Word{word: "G", address: 50}, %{operation: :turning}),
-    do: some("Position register")
+      {ok(17), _} ->
+        some("XY plane selection")
 
-  defp do_describe(%Word{word: "G", address: 50}, _), do: some("Scaling function cancel")
-  defp do_describe(%Word{word: "G", address: 52}, _), do: some("Local coordinate system")
-  defp do_describe(%Word{word: "G", address: 53}, _), do: some("Machine coordinate system")
+      {ok(18), _} ->
+        some("ZX plane selection")
 
-  defp do_describe(%Word{word: "G", address: address}, _)
-       when address in [54, 55, 56, 57, 58, 59, 54.1],
-       do: some("Work coordinate system")
+      {ok(19), _} ->
+        some("YZ plane selection")
 
-  defp do_describe(%Word{word: "G", address: 61}, _), do: some("Exact stop check - modal")
-  defp do_describe(%Word{word: "G", address: 62}, _), do: some("Automatic corner override")
-  defp do_describe(%Word{word: "G", address: 64}, _), do: some("Default cutting mode")
-  defp do_describe(%Word{word: "G", address: 68}, _), do: some("Rotate coordinate system")
+      {ok(20), _} ->
+        some("Unit is inches")
 
-  defp do_describe(%Word{word: "G", address: 69}, _),
-    do: some("Turn off coordinate system rotation")
+      {ok(21), _} ->
+        some("Unit is mm")
 
-  defp do_describe(%Word{word: "G", address: 70}, %{operation: :turning}),
-    do: some("Fixed cycle, multiple repetitive cycle - for finishing")
+      {ok(28), _} ->
+        some("Return to home position")
 
-  defp do_describe(%Word{word: "G", address: 71}, %{operation: :turning}),
-    do: some("Fixed cycle, multiple repetitive cycle - for roughing with Z axis emphasis")
+      {ok(30), _} ->
+        some("Return to secondary home position")
 
-  defp do_describe(%Word{word: "G", address: 72}, %{operation: :turning}),
-    do: some("Fixed cycle, multiple repetitive cycle - for roughing with X axis emphasis")
+      {ok(31), _} ->
+        some("Feed until skip function")
 
-  defp do_describe(%Word{word: "G", address: 73}, %{operation: :turning}),
-    do: some("Fixed cycle, multiple repetitive cycle - for roughing with pattern repetition")
+      {ok(32), _} ->
+        some("Single-point threading")
 
-  defp do_describe(%Word{word: "G", address: 73}, _), do: some("Peck drilling cycle")
+      {ok(33), _} ->
+        some("Variable pitch threading")
 
-  defp do_describe(%Word{word: "G", address: 74}, %{operation: :turning}),
-    do: some("Peck drilling cycle")
+      {ok(40), _} ->
+        some("Tool radius compensation off")
 
-  defp do_describe(%Word{word: "G", address: 74}, _), do: some("Tapping cycle")
+      {ok(41), _} ->
+        some("Tool radius compensation left")
 
-  defp do_describe(%Word{word: "G", address: 75}, %{operation: :turning}),
-    do: some("Peck grooving cycle")
+      {ok(42), _} ->
+        some("Tool radius compensation right")
 
-  defp do_describe(%Word{word: "G", address: 76}, %{operation: :turning}),
-    do: some("Threading cycle")
+      {ok(43), _} ->
+        some("Tool height offset compensation negative")
 
-  defp do_describe(%Word{word: "G", address: 76}, _), do: some("Fine boring cycle")
-  defp do_describe(%Word{word: "G", address: 80}, _), do: some("Cancel cycle")
-  defp do_describe(%Word{word: "G", address: 81}, _), do: some("Simple drilling cycle")
-  defp do_describe(%Word{word: "G", address: 82}, _), do: some("Drilling cycle with dwell")
-  defp do_describe(%Word{word: "G", address: 83}, _), do: some("Peck drilling cycle")
+      {ok(44), _} ->
+        some("Tool height offset compensation positive")
 
-  defp do_describe(%Word{word: "G", address: 84}, _),
-    do: some("Tapping cycle, righthand thread, M03 spindle direction")
+      {ok(45), _} ->
+        some("Axis offset single increase")
 
-  defp do_describe(%Word{word: "G", address: 84.2}, _),
-    do: some("Tapping cycle, righthand thread, M03 spindle direction, rigid toolholder")
+      {ok(46), _} ->
+        some("Axis offset single decrease")
 
-  defp do_describe(%Word{word: "G", address: 84.3}, _),
-    do: some("Tapping cycle, lefthand thread, M04 spindle direction, rigid toolholder")
+      {ok(47), _} ->
+        some("Axis offset double increase")
 
-  defp do_describe(%Word{word: "G", address: 85}, _), do: some("Boring cycle, feed in/feed out")
+      {ok(48), _} ->
+        some("Axis offset double decrease")
 
-  defp do_describe(%Word{word: "G", address: 86}, _),
-    do: some("Boring cycle, feed in/spindle stop/rapid out")
+      {ok(49), _} ->
+        some("Tool length offset compensation cancel")
 
-  defp do_describe(%Word{word: "G", address: 87}, _), do: some("Boring cycle, backboring")
+      {ok(50), %{operation: :turning}} ->
+        some("Position register")
 
-  defp do_describe(%Word{word: "G", address: 88}, _),
-    do: some("Boring cycle, feed in/spindle stop/manual operation")
+      {ok(50), _} ->
+        some("Scaling function cancel")
 
-  defp do_describe(%Word{word: "G", address: 89}, _),
-    do: some("Boring cycle, feed in/dwell/feed out")
+      {ok(52), _} ->
+        some("Local coordinate system")
 
-  defp do_describe(%Word{word: "G", address: 90}, _), do: some("Absolute positioning")
-  defp do_describe(%Word{word: "G", address: 91}, _), do: some("Relative positioning")
-  defp do_describe(%Word{word: "G", address: 92}, _), do: some("Position register")
-  defp do_describe(%Word{word: "G", address: 94}, _), do: some("Feedrate per minute")
-  defp do_describe(%Word{word: "G", address: 95}, _), do: some("Feedrate per revolution")
-  defp do_describe(%Word{word: "G", address: 96}, _), do: some("Constant surface speed")
-  defp do_describe(%Word{word: "G", address: 97}, _), do: some("Constant spindle speed")
+      {ok(53), _} ->
+        some("Machine coordinate system")
 
-  defp do_describe(%Word{word: "G", address: 98}, %{operation: :turning}),
-    do: some("Feedrate per minute")
+      {ok(address), _} when address in [54, 55, 56, 57, 58, 59, 54.1] ->
+        some("Work coordinate system")
 
-  defp do_describe(%Word{word: "G", address: 98}, _),
-    do: some("Return to initial Z level in canned cycle")
+      {ok(61), _} ->
+        some("Exact stop check - modal")
 
-  defp do_describe(%Word{word: "G", address: 99}, %{operation: :turning}),
-    do: some("Feedrate per revolution")
+      {ok(62), _} ->
+        some("Automatic corner override")
 
-  defp do_describe(%Word{word: "G", address: 99}, _),
-    do: some("Return to R level in canned cycle")
+      {ok(64), _} ->
+        some("Default cutting mode")
 
-  defp do_describe(%Word{word: "G", address: 100}, _), do: some("Tool length measurement")
+      {ok(68), _} ->
+        some("Rotate coordinate system")
 
-  defp do_describe(%Word{word: "H", address: length}, options),
-    do: some("Tool length offset #{distance_with_unit(length, options)}")
+      {ok(69), _} ->
+        some("Turn off coordinate system rotation")
 
-  defp do_describe(%Word{word: "I", address: offset}, options),
-    do: some("X arc center offset #{distance_with_unit(offset, options)}")
+      {ok(70), %{operation: :turning}} ->
+        some("Fixed cycle, multiple repetitive cycle - for finishing")
 
-  defp do_describe(%Word{word: "J", address: offset}, options),
-    do: some("Y arc center offset #{distance_with_unit(offset, options)}")
+      {ok(71), %{operation: :turning}} ->
+        some("Fixed cycle, multiple repetitive cycle - for roughing with Z axis emphasis")
 
-  defp do_describe(%Word{word: "K", address: offset}, options),
-    do: some("Z arc center offset #{distance_with_unit(offset, options)}")
+      {ok(72), %{operation: :turning}} ->
+        some("Fixed cycle, multiple repetitive cycle - for roughing with X axis emphasis")
 
-  defp do_describe(%Word{word: "L", address: count}, _), do: some("Loop count #{count}")
+      {ok(73), %{operation: :turning}} ->
+        some("Fixed cycle, multiple repetitive cycle - for roughing with pattern repetition")
 
-  defp do_describe(%Word{word: "M", address: 0}, _), do: some("Compulsory stop")
-  defp do_describe(%Word{word: "M", address: 1}, _), do: some("Optional stop")
-  defp do_describe(%Word{word: "M", address: 2}, _), do: some("End of program")
-  defp do_describe(%Word{word: "M", address: 3}, _), do: some("Spindle on clockwise")
-  defp do_describe(%Word{word: "M", address: 4}, _), do: some("Spindle on counterclockwise")
-  defp do_describe(%Word{word: "M", address: 5}, _), do: some("Spindle stop")
-  defp do_describe(%Word{word: "M", address: 6}, _), do: some("Automatic tool change")
-  defp do_describe(%Word{word: "M", address: 7}, _), do: some("Coolant mist")
-  defp do_describe(%Word{word: "M", address: 8}, _), do: some("Coolant flood")
-  defp do_describe(%Word{word: "M", address: 9}, _), do: some("Coolant off")
-  defp do_describe(%Word{word: "M", address: 10}, _), do: some("Pallet clamp on")
-  defp do_describe(%Word{word: "M", address: 11}, _), do: some("Pallet clamp off")
+      {ok(73), _} ->
+        some("Peck drilling cycle")
 
-  defp do_describe(%Word{word: "M", address: 13}, _),
-    do: some("Spindle on clockwise and coolant flood")
+      {ok(74), %{operation: :turning}} ->
+        some("Peck drilling cycle")
 
-  defp do_describe(%Word{word: "M", address: 19}, _), do: some("Spindle orientation")
+      {ok(74), _} ->
+        some("Tapping cycle")
 
-  defp do_describe(%Word{word: "M", address: 21}, %{operation: :turning}),
-    do: some("Tailstock forward")
+      {ok(75), %{operation: :turning}} ->
+        some("Peck grooving cycle")
 
-  defp do_describe(%Word{word: "M", address: 21}, _), do: some("Mirror X axis")
+      {ok(76), %{operation: :turning}} ->
+        some("Threading cycle")
 
-  defp do_describe(%Word{word: "M", address: 22}, %{operation: :turning}),
-    do: some("Tailstock backward")
+      {ok(76), _} ->
+        some("Fine boring cycle")
 
-  defp do_describe(%Word{word: "M", address: 22}, _), do: some("Mirror Y axis")
+      {ok(80), _} ->
+        some("Cancel cycle")
 
-  defp do_describe(%Word{word: "M", address: 23}, %{operation: :turning}),
-    do: some("Thread gradual pullout on")
+      {ok(81), _} ->
+        some("Simple drilling cycle")
 
-  defp do_describe(%Word{word: "M", address: 23}, _), do: some("Mirror off")
+      {ok(82), _} ->
+        some("Drilling cycle with dwell")
 
-  defp do_describe(%Word{word: "M", address: 24}, %{operation: :turning}),
-    do: some("Thread gradual pullout off")
+      {ok(83), _} ->
+        some("Peck drilling cycle")
 
-  defp do_describe(%Word{word: "M", address: 30}, _), do: some("End of program")
+      {ok(84), _} ->
+        some("Tapping cycle, righthand thread, M03 spindle direction")
 
-  defp do_describe(%Word{word: "M", address: gear}, %{operation: :turning})
-       when is_integer(gear) and gear > 40 and gear < 45,
-       do: some("Gear select #{gear - 40}")
+      {ok(84.2), _} ->
+        some("Tapping cycle, righthand thread, M03 spindle direction, rigid toolholder")
 
-  defp do_describe(%Word{word: "M", address: 48}, _), do: some("Feedrate override allowed")
-  defp do_describe(%Word{word: "M", address: 49}, _), do: some("Feedrate override not allowed")
-  defp do_describe(%Word{word: "M", address: 52}, _), do: some("Unload tool")
-  defp do_describe(%Word{word: "M", address: 60}, _), do: some("Automatic pallet change")
-  defp do_describe(%Word{word: "M", address: 98}, _), do: some("Subprogram call")
-  defp do_describe(%Word{word: "M", address: 99}, _), do: some("Subprogram end")
-  defp do_describe(%Word{word: "M", address: 100}, _), do: some("Clean nozzle")
-  defp do_describe(%Word{word: "N", address: line}, _), do: some("Line #{line}")
-  defp do_describe(%Word{word: "O", address: name}, _), do: some("Program #{name}")
-  defp do_describe(%Word{word: "P", address: param}, _), do: some("Parameter #{param}")
+      {ok(84.3), _} ->
+        some("Tapping cycle, lefthand thread, M04 spindle direction, rigid toolholder")
 
-  defp do_describe(%Word{word: "Q", address: distance}, options),
-    do: some("Peck increment #{distance_with_unit(distance, options)}")
+      {ok(85), _} ->
+        some("Boring cycle, feed in/feed out")
 
-  defp do_describe(%Word{word: "R", address: distance}, options),
-    do: some("Radius #{distance_with_unit(distance, options)}")
+      {ok(86), _} ->
+        some("Boring cycle, feed in/spindle stop/rapid out")
 
-  defp do_describe(%Word{word: "S", address: speed}, _), do: some("Speed #{speed}")
-  defp do_describe(%Word{word: "T", address: tool}, _), do: some("Tool #{tool}")
+      {ok(87), _} ->
+        some("Boring cycle, backboring")
 
-  defp do_describe(%Word{word: "X", address: position}, options),
-    do: some("X #{distance_with_unit(position, options)}")
+      {ok(88), _} ->
+        some("Boring cycle, feed in/spindle stop/manual operation")
 
-  defp do_describe(%Word{word: "Y", address: position}, options),
-    do: some("Y #{distance_with_unit(position, options)}")
+      {ok(89), _} ->
+        some("Boring cycle, feed in/dwell/feed out")
 
-  defp do_describe(%Word{word: "Z", address: position}, options),
-    do: some("Z #{distance_with_unit(position, options)}")
+      {ok(90), _} ->
+        some("Absolute positioning")
+
+      {ok(91), _} ->
+        some("Relative positioning")
+
+      {ok(92), _} ->
+        some("Position register")
+
+      {ok(94), _} ->
+        some("Feedrate per minute")
+
+      {ok(95), _} ->
+        some("Feedrate per revolution")
+
+      {ok(96), _} ->
+        some("Constant surface speed")
+
+      {ok(97), _} ->
+        some("Constant spindle speed")
+
+      {ok(98), %{operation: :turning}} ->
+        some("Feedrate per minute")
+
+      {ok(98), _} ->
+        some("Return to initial Z level in canned cycle")
+
+      {ok(99), %{operation: :turning}} ->
+        some("Feedrate per revolution")
+
+      {ok(99), _} ->
+        some("Return to R level in canned cycle")
+
+      {ok(100), _} ->
+        some("Tool length measurement")
+
+      _ ->
+        none()
+    end
+  end
+
+  defp do_describe(%Word{word: "H", address: length}, options) do
+    case distance_with_unit(length, options) do
+      ok(length) -> some("Tool length offset #{length}")
+      _ -> none()
+    end
+  end
+
+  defp do_describe(%Word{word: "I", address: offset}, options) do
+    case distance_with_unit(offset, options) do
+      ok(offset) -> some("X arc center offset #{offset}")
+      _ -> none()
+    end
+  end
+
+  defp do_describe(%Word{word: "J", address: offset}, options) do
+    case distance_with_unit(offset, options) do
+      ok(offset) -> some("Y arc center offset #{offset}")
+      _ -> none()
+    end
+  end
+
+  defp do_describe(%Word{word: "K", address: offset}, options) do
+    case distance_with_unit(offset, options) do
+      ok(offset) -> some("Z arc center offset #{offset}")
+      _ -> none()
+    end
+  end
+
+  defp do_describe(%Word{word: "L", address: count}, _) do
+    case Expr.evaluate(count) do
+      ok(count) -> some("Loop count #{count}")
+      _ -> none()
+    end
+  end
+
+  defp do_describe(%Word{word: "M", address: address}, options) do
+    case {Expr.evaluate(address), options} do
+      {ok(0), _} ->
+        some("Compulsory stop")
+
+      {ok(1), _} ->
+        some("Optional stop")
+
+      {ok(2), _} ->
+        some("End of program")
+
+      {ok(3), _} ->
+        some("Spindle on clockwise")
+
+      {ok(4), _} ->
+        some("Spindle on counterclockwise")
+
+      {ok(5), _} ->
+        some("Spindle stop")
+
+      {ok(6), _} ->
+        some("Automatic tool change")
+
+      {ok(7), _} ->
+        some("Coolant mist")
+
+      {ok(8), _} ->
+        some("Coolant flood")
+
+      {ok(9), _} ->
+        some("Coolant off")
+
+      {ok(10), _} ->
+        some("Pallet clamp on")
+
+      {ok(11), _} ->
+        some("Pallet clamp off")
+
+      {ok(13), _} ->
+        some("Spindle on clockwise and coolant flood")
+
+      {ok(19), _} ->
+        some("Spindle orientation")
+
+      {ok(21), %{operation: :turning}} ->
+        some("Tailstock forward")
+
+      {ok(21), _} ->
+        some("Mirror X axis")
+
+      {ok(22), %{operation: :turning}} ->
+        some("Tailstock backward")
+
+      {ok(22), _} ->
+        some("Mirror Y axis")
+
+      {ok(23), %{operation: :turning}} ->
+        some("Thread gradual pullout on")
+
+      {ok(23), _} ->
+        some("Mirror off")
+
+      {ok(24), %{operation: :turning}} ->
+        some("Thread gradual pullout off")
+
+      {ok(30), _} ->
+        some("End of program")
+
+      {ok(gear), %{operation: :turning}} when gear > 40 and gear < 45 ->
+        some("Gear select #{gear - 40}")
+
+      {ok(48), _} ->
+        some("Feedrate override allowed")
+
+      {ok(49), _} ->
+        some("Feedrate override not allowed")
+
+      {ok(52), _} ->
+        some("Unload tool")
+
+      {ok(60), _} ->
+        some("Automatic pallet change")
+
+      {ok(98), _} ->
+        some("Subprogram call")
+
+      {ok(99), _} ->
+        some("Subprogram end")
+
+      {ok(100), _} ->
+        some("Clean nozzle")
+
+      _ ->
+        none()
+    end
+  end
+
+  defp do_describe(%Word{word: "N", address: line}, _) do
+    case Expr.evaluate(line) do
+      ok(line) -> some("Line #{line}")
+      _ -> none()
+    end
+  end
+
+  defp do_describe(%Word{word: "O", address: name}, _) do
+    case Expr.evaluate(name) do
+      ok(name) -> some("Program #{name}")
+      _ -> none()
+    end
+  end
+
+  defp do_describe(%Word{word: "P", address: param}, _) do
+    case Expr.evaluate(param) do
+      ok(param) -> some("Parameter #{param}")
+      _ -> none()
+    end
+  end
+
+  defp do_describe(%Word{word: "Q", address: distance}, options) do
+    case distance_with_unit(distance, options) do
+      ok(distance) -> some("Peck increment #{distance}")
+      _ -> none()
+    end
+  end
+
+  defp do_describe(%Word{word: "R", address: distance}, options) do
+    case distance_with_unit(distance, options) do
+      ok(distance) -> some("Radius #{distance}")
+      _ -> none()
+    end
+  end
+
+  defp do_describe(%Word{word: "S", address: speed}, _) do
+    case Expr.evaluate(speed) do
+      ok(speed) -> some("Speed #{speed}")
+      _ -> none()
+    end
+  end
+
+  defp do_describe(%Word{word: "T", address: tool}, _) do
+    case Expr.evaluate(tool) do
+      ok(tool) -> some("Tool #{tool}")
+      _ -> none()
+    end
+  end
+
+  defp do_describe(%Word{word: axis, address: distance}, options) when axis in ~w[X Y Z] do
+    case distance_with_unit(distance, options) do
+      ok(distance) -> some("#{axis} #{distance}")
+      _ -> none()
+    end
+  end
 
   defp do_describe(%Word{}, _options), do: none()
 
-  defp distance_with_unit(distance, %{units: :mm}), do: "#{distance}mm"
-  defp distance_with_unit(distance, %{units: :inches}), do: "#{distance}\""
-  defp distance_with_unit(distance, _), do: distance
+  defp distance_with_unit(distance, %{units: :mm}) when is_number(distance),
+    do: some("#{distance}mm")
 
-  defp feedrate(distance, %{operation: :turning} = options),
-    do: "#{distance_with_unit(distance, options)}/rev"
+  defp distance_with_unit(distance, %{units: :inches}) when is_number(distance),
+    do: some("#{distance}\"")
 
-  defp feedrate(distance, options), do: "#{distance_with_unit(distance, options)}/min"
+  defp distance_with_unit(distance, _) when is_number(distance),
+    do: some(to_string(distance))
+
+  defp distance_with_unit(distance, options) when is_expression(distance) do
+    case Expr.evaluate(distance) do
+      ok(distance) when is_number(distance) -> distance_with_unit(distance, options)
+      _ -> none()
+    end
+  end
+
+  defp distance_with_unit(_, _), do: none()
+
+  defp feedrate(distance, %{operation: :turning} = options) do
+    case distance_with_unit(distance, options) do
+      some(distance) -> some("#{distance}/rev")
+      _ -> none()
+    end
+  end
+
+  defp feedrate(distance, options) do
+    case distance_with_unit(distance, options) do
+      some(distance) -> some("#{distance}/min")
+      _ -> none()
+    end
+  end
 end

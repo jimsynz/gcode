@@ -3,6 +3,11 @@ defimpl Gcode.Model.Serialise, for: Gcode.Model.Block do
   use Gcode.Option
   use Gcode.Result
 
+  @moduledoc """
+  Implements the `Serialise` protocol for `Block`, meaning that blocks can be
+  turned into G-code output.
+  """
+
   @spec serialise(Block.t()) :: Result.t([String.t()], {:serialise_error, any})
   def serialise(%Block{words: words, comment: some(comment)}) do
     words

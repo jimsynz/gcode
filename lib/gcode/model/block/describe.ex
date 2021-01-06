@@ -3,6 +3,12 @@ defimpl Gcode.Model.Describe, for: Gcode.Model.Block do
   use Gcode.Option
   use Gcode.Result
 
+  @moduledoc """
+  Implements the `Describe` protocol for `Block`, meaning that we can convert
+  blocks into human-readable strings.
+  """
+
+  @doc false
   @spec describe(Block.t(), options :: []) :: Option.t(String.t())
   def describe(%Block{words: words, comment: some(comment)}, options) do
     words = describe_words(words, options)

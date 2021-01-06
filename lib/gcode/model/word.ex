@@ -1,5 +1,6 @@
 defmodule Gcode.Model.Word do
-  alias Gcode.Model.Word
+  alias Gcode.Model.{Expr, Word}
+  import Gcode.Model.Expr.Helpers
   use Gcode.Option
   use Gcode.Result
 
@@ -11,7 +12,7 @@ defmodule Gcode.Model.Word do
 
   @type t :: %Word{
           word: String.t(),
-          address: number
+          address: Expr.t()
         }
 
   @doc """
@@ -20,10 +21,10 @@ defmodule Gcode.Model.Word do
   ## Example
 
       iex> Word.init("G", 0)
-      {:ok, %Word{word: "G", address: 0}}
+      {:ok, %Word{word: "G", address: %Integer{i: 0}}}
   """
-  @spec init(String.t(), number) :: Result.t(t)
-  def init(word, address) when is_binary(word) and is_number(address) do
+  @spec init(String.t(), number | Expr.t()) :: Result.t(t)
+  def init(word, address) when is_binary(word) and is_expression(address) do
     if Regex.match?(~r/^[A-Z]$/, word) do
       ok(%Word{word: word, address: address})
     else
@@ -31,9 +32,31 @@ defmodule Gcode.Model.Word do
     end
   end
 
-  def init(word, address) when is_number(address),
+  def init(word, address) when is_binary(word) and is_integer(address) do
+    if Regex.match?(~r/^[A-Z]$/, word) do
+      ok(address) = Expr.Integer.init(address)
+      ok(%Word{word: word, address: address})
+    else
+      error({:word_error, "Expected word to be a single character, received #{inspect(word)}"})
+    end
+  end
+
+  def init(word, address) when is_binary(word) and is_float(address) do
+    if Regex.match?(~r/^[A-Z]$/, word) do
+      ok(address) = Expr.Float.init(address)
+      ok(%Word{word: word, address: address})
+    else
+      error({:word_error, "Expected word to be a single character, received #{inspect(word)}"})
+    end
+  end
+
+  def init(word, address) when is_expression(address),
     do: error({:word_error, "Expected word to be a string, received #{inspect(word)}"})
 
   def init(_word, address),
-    do: error({:word_error, "Expected address to be a number, received #{inspect(address)}"})
+    do:
+      error(
+        {:word_error,
+         "Expected address to be an expression or a number, received #{inspect(address)}"}
+      )
 end

@@ -1,6 +1,9 @@
 defimpl Enumerable, for: Gcode.Model.Program do
   alias Gcode.Model.Program
-  @moduledoc false
+
+  @moduledoc """
+  Implements the `Enumerable` protocol for `Program`.
+  """
 
   @spec count(Program.t()) :: {:ok, non_neg_integer()} | {:error, module}
   def count(%Program{elements: elements}), do: {:ok, Enum.count(elements)}

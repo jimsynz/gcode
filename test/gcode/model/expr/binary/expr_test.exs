@@ -1,0 +1,53 @@
+defmodule Gcode.Model.Expr.Binary.ExprTest do
+  use ExUnit.Case, async: true
+  use Gcode.Result
+  import InfixHelper
+  @moduledoc false
+
+  describe "Expr.evaluate/1" do
+    it_evaluates_to(:*, 2, 3, ok(6))
+    it_evaluates_to(:*, 2.0, 3.0, ok(6.0))
+    it_evaluates_to(:*, 2, 3.0, error({:program_error, _}))
+    it_evaluates_to(:/, 3.0, 2.0, ok(1.5))
+    it_evaluates_to(:/, 2, 3, error({:program_error, _}))
+    it_evaluates_to(:+, 2, 3, ok(5))
+    it_evaluates_to(:+, 2.0, 3.0, ok(5.0))
+    it_evaluates_to(:-, 2, 3, ok(-1))
+    it_evaluates_to(:-, 2.0, 3.0, ok(-1.0))
+    it_evaluates_to(:==, 1, 1, ok(true))
+    it_evaluates_to(:==, 1, 2, ok(false))
+    it_evaluates_to(:==, 1.0, 1.0, ok(true))
+    it_evaluates_to(:==, 1.0, 2.0, ok(false))
+    it_evaluates_to(:==, "a", "a", ok(true))
+    it_evaluates_to(:==, "a", "b", ok(false))
+    it_evaluates_to(:!=, 1, 1, ok(false))
+    it_evaluates_to(:!=, 1, 2, ok(true))
+    it_evaluates_to(:!=, 1.0, 1.0, ok(false))
+    it_evaluates_to(:!=, 1.0, 2.0, ok(true))
+    it_evaluates_to(:!=, "a", "a", ok(false))
+    it_evaluates_to(:!=, "a", "b", ok(true))
+    it_evaluates_to(:<, 1, 2, ok(true))
+    it_evaluates_to(:<, 1, 1, ok(false))
+    it_evaluates_to(:<, 1.0, 2.0, ok(true))
+    it_evaluates_to(:<, 1.0, 1.0, ok(false))
+    it_evaluates_to(:<=, 1, 2, ok(true))
+    it_evaluates_to(:<=, 1, 1, ok(true))
+    it_evaluates_to(:<=, 1.0, 2.0, ok(true))
+    it_evaluates_to(:<=, 1.0, 1.0, ok(true))
+    it_evaluates_to(:>, 1, 2, ok(false))
+    it_evaluates_to(:>, 1, 1, ok(false))
+    it_evaluates_to(:>, 1.0, 2.0, ok(false))
+    it_evaluates_to(:>, 1.0, 1.0, ok(false))
+    it_evaluates_to(:>=, 1, 2, ok(false))
+    it_evaluates_to(:>=, 1, 1, ok(true))
+    it_evaluates_to(:>=, 1.0, 2.0, ok(false))
+    it_evaluates_to(:>=, 1.0, 1.0, ok(true))
+    it_evaluates_to(:&&, true, true, ok(true))
+    it_evaluates_to(:&&, true, false, ok(false))
+    it_evaluates_to(:&&, false, false, ok(false))
+    it_evaluates_to(:||, true, true, ok(true))
+    it_evaluates_to(:||, true, false, ok(true))
+    it_evaluates_to(:||, false, false, ok(false))
+    it_evaluates_to(:^, "a", "b", ok("ab"))
+  end
+end
