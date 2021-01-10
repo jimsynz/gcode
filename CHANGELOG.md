@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.4.0](https://gitlab.com/jimsy/gcode/compare/v0.3.0...v0.4.0) (2021-01-10)
+
+
+
+
+### Features:
+
+* Implement (a common subset) G-code parsing.
+
 ## [v0.3.0](https://gitlab.com/jimsy/gcode/compare/v0.2.1...v0.3.0) (2021-01-05)
 
 
