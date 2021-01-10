@@ -4,17 +4,17 @@
 
 ## Installation
 
-This package is not yet available in [Hex](https://hex.pm/), because it's not ready yet.
+This package is [available in Hex](https://hex.pm/packages/gcode).
 
-You can install it from git by adding `{:gcode, git: "https://gitlab.com/jimsy/gcode", tag: "v0.2.1"}` to your dependencies.
+You can install it from git by adding `{:gcode, "~> 0.4.0"}` to your dependencies.
 
 ## Documentation
 
-Documentation for the main branch of this package is always available [on gitlab pages](https://jimsy.gitlab.io/gcode)
+Documentation for the main branch of this package is always available [on gitlab pages](https://jimsy.gitlab.io/gcode), and released versions are published [on Hexdocs](https://hexdocs.pm/gcode).
 
 ## Contributing
 
-This project uses the wonderful [git_ops](https://hex.pm/packages/git_ops) package to automate releases and as such requires the use of [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+This project uses the wonderful [git_ops](https://hex.pm/packages/git_ops) package to automate releases and as such requires the use of [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).  Feel free to open issues and pull requests.
 
 ## License
 
