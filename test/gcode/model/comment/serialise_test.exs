@@ -1,6 +1,7 @@
 defmodule Gcode.Model.Comment.SerialiseTest do
   use ExUnit.Case, async: true
   alias Gcode.Model.{Comment, Serialise}
+  use Gcode.Result
   @moduledoc false
 
   describe "serialise/1" do
@@ -13,8 +14,8 @@ defmodule Gcode.Model.Comment.SerialiseTest do
       """
 
       actual =
-        with {:ok, comment} <- Comment.init(comment),
-             {:ok, comment} <- Serialise.serialise(comment),
+        with ok(comment) <- Comment.init(comment),
+             ok(comment) <- Serialise.serialise(comment),
              do: comment
 
       expected = ~w[(This) (is) (a) (test)]

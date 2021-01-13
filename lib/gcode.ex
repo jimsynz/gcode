@@ -1,5 +1,6 @@
 defmodule Gcode do
-  alias Gcode.{Model.Program, Model.Serialise, Result}
+  alias Gcode.{Model.Program, Model.Serialise}
+  use Gcode.Result
 
   @moduledoc """
   Gcode - a library for parsing and serialising G-code.
@@ -23,9 +24,7 @@ defmodule Gcode do
   def serialise(%Program{} = program) do
     program
     |> Serialise.serialise()
-    |> Result.Enum.map(fn block ->
-      {:ok, "#{block}\r\n"}
-    end)
+    |> Result.Enum.map(&ok("#{&1}\r\n"))
     |> Result.Enum.join("")
   end
 end

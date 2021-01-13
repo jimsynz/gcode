@@ -17,5 +17,5 @@ defimpl Gcode.Model.Serialise, for: Gcode.Model.Comment do
     |> ok()
   end
 
-  def serialise(_comment), do: {:error, {:serialise_error, "Invalid comment"}}
+  def serialise(_comment), do: error({:serialise_error, "Invalid comment"})
 end

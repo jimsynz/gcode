@@ -29,7 +29,7 @@ defmodule DescribeCase do
   end
 
   def make_block(input) do
-    {:ok, block} = Block.init()
+    ok(block) = Block.init()
 
     input
     |> String.trim()
@@ -40,9 +40,9 @@ defmodule DescribeCase do
     |> Result.Enum.reduce_while_ok(block, &Block.push(&2, &1))
   end
 
-  @spec make_program(binary) :: {:error, any} | {:ok, any}
+  @spec make_program(binary) :: Result.t()
   def make_program(input) do
-    {:ok, program} = Program.init()
+    ok(program) = Program.init()
 
     input
     |> String.trim()
