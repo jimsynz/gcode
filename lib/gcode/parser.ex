@@ -19,12 +19,14 @@ defmodule Gcode.Parser do
          ok(program) <- hydrate(tokens) do
       ok(program)
     else
-      {:error, reason} ->
-        {:parse_error, reason}
+      error(reason) ->
+        error({:parse_error, reason})
 
-      {:error, {message, unexpected, _, {line, _}, col}} ->
-        {:parse_error,
-         "Unexpected #{inspect(unexpected)} at line: #{line}:#{col + 1}. #{message}."}
+      error({message, unexpected, _, {line, _}, col}) ->
+        error(
+          {:parse_error,
+           "Unexpected #{inspect(unexpected)} at line: #{line}:#{col + 1}. #{message}."}
+        )
     end
   end
 
@@ -38,12 +40,14 @@ defmodule Gcode.Parser do
          ok(program) <- hydrate(tokens) do
       ok(program)
     else
-      {:error, reason} ->
-        {:parse_error, reason}
+      error(reason) ->
+        error({:parse_error, reason})
 
-      {:error, {message, unexpected, _, {line, _}, col}} ->
-        {:parse_error,
-         "Unexpected #{inspect(unexpected)} at line: #{line}:#{col + 1}. #{message}."}
+      error({message, unexpected, _, {line, _}, col}) ->
+        error(
+          {:parse_error,
+           "Unexpected #{inspect(unexpected)} at line: #{line}:#{col + 1}. #{message}."}
+        )
     end
   end
 
