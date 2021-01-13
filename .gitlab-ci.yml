@@ -7,7 +7,7 @@ stages:
 
 variables:
   MIX_ENV: "test"
-  PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/"
+  PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic"
   HEX_HOME: "$CI_PROJECT_DIR/.hex"
   MIX_HOME: "$CI_PROJECT_DIR/.mix"
 
@@ -104,8 +104,8 @@ git_ops:
         mix hex.build -o "artifacts/${APP_NAME}-${APP_VERSION}.tar"
         gzip "artifacts/${APP_NAME}-${APP_VERSION}.tar"
         mix docs && tar zcvf "artifacts/${APP_NAME}-${APP_VERSION}-docs.tar.gz" doc/
-        curl --header "JOB_TOKEN: ${CI_JOB_TOKEN}" --upload-file "artifacts/${APP_NAME}-${APP_VERSION}.tar.gz" "${PACKAGE_REGISTRY_URL}/${APP_NAME}/${APP_VERSION}/${APP_NAME}-${APP_VERSION}.tar.gz"
-        curl --header "JOB_TOKEN: ${CI_JOB_TOKEN}" --upload-file "artifacts/${APP_NAME}-${APP_VERSION}-docs.tar.gz" "${PACKAGE_REGISTRY_URL}/${APP_NAME}/${APP_VERSION}/${APP_NAME}-${APP_VERSION}-docs.tar.gz"
+        curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "artifacts/${APP_NAME}-${APP_VERSION}.tar.gz" "${PACKAGE_REGISTRY_URL}/${APP_NAME}/${APP_VERSION}/${APP_NAME}-${APP_VERSION}.tar.gz"
+        curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "artifacts/${APP_NAME}-${APP_VERSION}-docs.tar.gz" "${PACKAGE_REGISTRY_URL}/${APP_NAME}/${APP_VERSION}/${APP_NAME}-${APP_VERSION}-docs.tar.gz"
         git push "https://project_${CI_PROJECT_ID}_bot:${RELEASE_TOKEN}@gitlab.com/${CI_PROJECT_PATH}.git" "HEAD:${CI_COMMIT_REF_NAME}" "refs/tags/v${APP_VERSION}"
       fi
   artifacts:
