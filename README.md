@@ -6,7 +6,7 @@
 
 This package is [available in Hex](https://hex.pm/packages/gcode).
 
-You can install it from git by adding `{:gcode, "~> 0.4.0"}` to your dependencies.
+You can install it from git by adding `{:gcode, "~> 0.4.1"}` to your dependencies.
 
 ## Documentation
 

@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.4.1](https://gitlab.com/jimsy/gcode/compare/v0.4.0...v0.4.1) (2021-01-13)
+
+
+
+
+### Bug Fixes:
+
+* bug in parsing not returning errors
+
 ## [v0.4.0](https://gitlab.com/jimsy/gcode/compare/v0.3.0...v0.4.0) (2021-01-10)
 
 
