@@ -43,7 +43,7 @@ defmodule Gcode.MixProject do
     [
       {:ex_doc, ">= 0.0.0", only: ~w[dev test]a, runtime: false},
       {:earmark, ">= 0.0.0", only: ~w[dev test]a, runtime: false},
-      {:credo, "~> 1.1", only: ~w[dev test]a, runtime: false},
+      {:credo, "~> 1.6", only: ~w[dev test]a, runtime: false},
       {:git_ops, "~> 2.3", only: ~w[dev test]a, runtime: false},
       {:nimble_parsec, "~> 1.1"},
       {:parallel_stream, "~> 1.0"}
