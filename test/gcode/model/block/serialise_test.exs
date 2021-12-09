@@ -13,8 +13,7 @@ defmodule Gcode.Model.Block.SerialiseTest do
                ok(block) <- Block.push(block, word),
                ok(address) <- Expr.Integer.init(100),
                ok(word) <- Word.init("N", address),
-               ok(block) <- Block.push(block, word),
-               do: ok(block)
+               do: Block.push(block, word)
              )
 
     assert ok([actual]) = Serialise.serialise(block)

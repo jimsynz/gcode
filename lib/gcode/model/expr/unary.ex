@@ -34,8 +34,6 @@ defmodule Gcode.Model.Expr.Unary do
     do:
       error(
         {:expression_error,
-         "Expected unary operator and expression, but received #{
-           inspect(operator: operator, expression: expr)
-         }"}
+         "Expected unary operator and expression, but received #{inspect(operator: operator, expression: expr)}"}
       )
 end

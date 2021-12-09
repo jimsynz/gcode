@@ -14,9 +14,7 @@ defmodule InfixHelper do
   @spec it_evaluates_to(atom, value, value, any) :: Macro.t()
   defmacro it_evaluates_to(op, lhs, rhs, result) do
     quote do
-      test "when the operator is `#{unquote(op)}` and the lhs is `#{inspect(unquote(lhs))}` and the rhs is `#{
-             inspect(unquote(rhs))
-           }` it is correct" do
+      test "when the operator is `#{unquote(op)}` and the lhs is `#{inspect(unquote(lhs))}` and the rhs is `#{inspect(unquote(rhs))}` it is correct" do
         ok(lhs) = InfixHelper.cast_expression(unquote(lhs))
         ok(rhs) = InfixHelper.cast_expression(unquote(rhs))
         ok(bin) = Binary.init(unquote(op), lhs, rhs)

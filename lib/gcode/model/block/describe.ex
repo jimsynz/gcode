@@ -23,9 +23,9 @@ defimpl Gcode.Model.Describe, for: Gcode.Model.Block do
   defp describe_words(words, options) do
     words
     |> Enum.reverse()
-    |> Enum.map(&describe_or_serialise(&1, options))
-    |> Enum.reject(&Option.none?/1)
-    |> Enum.map(&Option.unwrap!/1)
+    |> Stream.map(&describe_or_serialise(&1, options))
+    |> Stream.reject(&Option.none?/1)
+    |> Stream.map(&Option.unwrap!/1)
     |> Enum.join(", ")
   end
 

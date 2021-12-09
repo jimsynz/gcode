@@ -63,7 +63,7 @@ defmodule DescribeCase do
 
         description =
           options
-          |> Enum.map(fn {k, v} -> "#{k}: #{v}" end)
+          |> Stream.map(fn {k, v} -> "#{k}: #{v}" end)
           |> Enum.join(", ")
 
         "#{input} with #{plural} #{description}"
@@ -92,7 +92,7 @@ defmodule DescribeCase do
 
         description =
           options
-          |> Enum.map(fn {k, v} -> "#{k}: #{v}" end)
+          |> Stream.map(fn {k, v} -> "#{k}: #{v}" end)
           |> Enum.join(", ")
 
         "#{input} with #{plural} #{description}"
@@ -121,7 +121,7 @@ defmodule DescribeCase do
 
         description =
           options
-          |> Enum.map(fn {k, v} -> "#{k}: #{v}" end)
+          |> Stream.map(fn {k, v} -> "#{k}: #{v}" end)
           |> Enum.join(", ")
 
         "program with #{plural} #{description}"

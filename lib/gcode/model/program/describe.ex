@@ -11,9 +11,9 @@ defimpl Gcode.Model.Describe, for: Gcode.Model.Program do
     lines =
       elements
       |> Enum.reverse()
-      |> Enum.map(&Describe.describe(&1, options))
-      |> Enum.reject(&(&1 == none()))
-      |> Enum.map(fn some(line) -> "#{line}\n" end)
+      |> Stream.map(&Describe.describe(&1, options))
+      |> Stream.reject(&(&1 == none()))
+      |> Stream.map(fn some(line) -> "#{line}\n" end)
       |> Enum.join("")
 
     some(lines)

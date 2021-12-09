@@ -29,8 +29,6 @@ defmodule Gcode.Model.Expr.Binary do
     do:
       error(
         {:expression_error,
-         "Expected an operator and two expressions, but received #{
-           inspect(operator: operator, lhs: lhs, rhs: rhs)
-         }"}
+         "Expected an operator and two expressions, but received #{inspect(operator: operator, lhs: lhs, rhs: rhs)}"}
       )
 end
