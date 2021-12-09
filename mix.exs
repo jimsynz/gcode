@@ -45,7 +45,7 @@ defmodule Gcode.MixProject do
       {:earmark, ">= 1.4.19", only: ~w[dev test]a, runtime: false},
       {:credo, "~> 1.6", only: ~w[dev test]a, runtime: false},
       {:git_ops, "~> 2.4", only: ~w[dev test]a, runtime: false},
-      {:nimble_parsec, "~> 1.1"},
+      {:nimble_parsec, "~> 1.2"},
       {:parallel_stream, "~> 1.0"}
     ]
   end
