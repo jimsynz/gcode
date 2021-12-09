@@ -46,7 +46,7 @@ defmodule Gcode.MixProject do
       {:credo, "~> 1.6", only: ~w[dev test]a, runtime: false},
       {:git_ops, "~> 2.4", only: ~w[dev test]a, runtime: false},
       {:nimble_parsec, "~> 1.2"},
-      {:parallel_stream, "~> 1.0"}
+      {:parallel_stream, "~> 1.1"}
     ]
   end
 
