@@ -42,7 +42,7 @@ defmodule Gcode.MixProject do
   defp deps do
     [
       {:ex_doc, ">= 0.26.0", only: ~w[dev test]a, runtime: false},
-      {:earmark, ">= 1.4.19", only: ~w[dev test]a, runtime: false},
+      {:earmark, ">= 1.4.20", only: ~w[dev test]a, runtime: false},
       {:credo, "~> 1.6", only: ~w[dev test]a, runtime: false},
       {:git_ops, "~> 2.4", only: ~w[dev test]a, runtime: false},
       {:nimble_parsec, "~> 1.2"},
