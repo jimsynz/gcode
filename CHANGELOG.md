@@ -5,6 +5,13 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v1.0.0](https://gitlab.com/jimsy/gcode/compare/v0.4.1...v1.0.0) (2023-01-16)
+### Breaking Changes:
+
+* Relicense to HL3-FULL.
+
+
+
 ## [v0.4.1](https://gitlab.com/jimsy/gcode/compare/v0.4.0...v0.4.1) (2021-01-13)
 
 
