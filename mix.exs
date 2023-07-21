@@ -33,7 +33,7 @@ defmodule Gcode.MixProject do
       maintainers: ["James Harton <james@harton.nz>"],
       licenses: ["HL3-FULL"],
       links: %{
-        "Source" => "https://gitlab.com/jimsy/gcode"
+        "Source" => "https://code.harton.nz/james/gcode"
       }
     ]
   end
