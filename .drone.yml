@@ -50,7 +50,7 @@ steps:
     - .rebar3
 
 - name: install dependencies
-  image: code.harton.nz/james/asdf_container:latest
+  image: harton.dev/james/asdf_container:latest
   pull: "always"
   environment:
     MIX_ENV: test
@@ -180,7 +180,7 @@ steps:
     - .rebar3
 
 - name: mix compile
-  image: code.harton.nz/james/asdf_container:latest
+  image: harton.dev/james/asdf_container:latest
   pull: "always"
   environment:
     MIX_ENV: test
@@ -199,7 +199,7 @@ steps:
   - asdf mix compile --warnings-as-errors
 
 - name: mix test
-  image: code.harton.nz/james/asdf_container:latest
+  image: harton.dev/james/asdf_container:latest
   pull: "always"
   environment:
     MIX_ENV: test
@@ -213,7 +213,7 @@ steps:
   - asdf mix test
 
 - name: mix credo
-  image: code.harton.nz/james/asdf_container:latest
+  image: harton.dev/james/asdf_container:latest
   pull: "always"
   environment:
     MIX_ENV: test
@@ -227,7 +227,7 @@ steps:
   - asdf mix credo --strict
 
 - name: mix hex.audit
-  image: code.harton.nz/james/asdf_container:latest
+  image: harton.dev/james/asdf_container:latest
   pull: "always"
   environment:
     MIX_ENV: test
@@ -241,7 +241,7 @@ steps:
   - asdf mix hex.audit
 
 - name: mix format
-  image: code.harton.nz/james/asdf_container:latest
+  image: harton.dev/james/asdf_container:latest
   pull: "always"
   environment:
     MIX_ENV: test
@@ -255,7 +255,7 @@ steps:
   - asdf mix format --check-formatted
 
 - name: mix deps.unlock
-  image: code.harton.nz/james/asdf_container:latest
+  image: harton.dev/james/asdf_container:latest
   pull: "always"
   environment:
     MIX_ENV: test
@@ -269,7 +269,7 @@ steps:
   - asdf mix deps.unlock --check-unused
 
 - name: mix git_ops.check_message
-  image: code.harton.nz/james/asdf_container:latest
+  image: harton.dev/james/asdf_container:latest
   pull: "always"
   environment:
     MIX_ENV: test
@@ -345,7 +345,7 @@ steps:
     - .rebar3
 
 - name: mix git_ops.release
-  image: code.harton.nz/james/asdf_container:latest
+  image: harton.dev/james/asdf_container:latest
   pull: "always"
   depends_on:
   - restore ASDF cache
@@ -436,7 +436,7 @@ steps:
     - .rebar3
 
 - name: build artifacts
-  image: code.harton.nz/james/asdf_container:latest
+  image: harton.dev/james/asdf_container:latest
   pull: "always"
   depends_on:
   - restore ASDF cache
@@ -468,14 +468,14 @@ steps:
   settings:
     api_key:
       from_secret: DRONE_TOKEN
-    base_url: https://code.harton.nz
+    base_url: https://harton.dev
     files: artifacts/*.tar.gz
     checksum: sha256
     title: tag_subject
     note: tag_body
 
 - name: hex release
-  image: code.harton.nz/james/asdf_container:latest
+  image: harton.dev/james/asdf_container:latest
   pull: "always"
   depends_on:
   - restore ASDF cache
