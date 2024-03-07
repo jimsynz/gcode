@@ -1,23 +1,33 @@
 # G-code
 
-[![Build Status](https://drone.harton.nz/api/badges/james/gcode/status.svg?ref=refs/heads/main)](https://drone.harton.nz/james/gcode)[![Hex.pm](https://img.shields.io/hexpm/v/gcode.svg)](https://hex.pm/packages/gcode)
+[![Build Status](https://drone.harton.dev/api/badges/james/gcode/status.svg?ref=refs/heads/main)](https://drone.harton.dev/james/gcode)
+[![Hex.pm](https://img.shields.io/hexpm/v/gcode.svg)](https://hex.pm/packages/gcode)
 [![Hippocratic License HL3-FULL](https://img.shields.io/static/v1?label=Hippocratic%20License&message=HL3-FULL&labelColor=5e2751&color=bc8c3d)](https://firstdonoharm.dev/version/3/0/full.html)
 
 `gcode` is an Elixir library for parsing and generating [G-code](https://en.wikipedia.org/wiki/G-code), which is a common language for working with CNC machines and 3D printers.
 
 ## Installation
 
-This package is [available in Hex](https://hex.pm/packages/gcode).
+Gcode is [available in Hex](https://hex.pm/packages/gcode), the package can be
+installed by adding `gcode` to your list of dependencies in `mix.exs`:
 
-You can install it from git by adding `{:gcode, "~> 1.0.0"}` to your dependencies.
+```elixir
+def deps do
+  [
+    {:gcode, "~> 1.0.0"}
+  ]
+end
+```
 
-## Documentation
+Documentation for the latest release can be found on
+[HexDocs](https://hexdocs.pm/gcode) and for the `main` branch on
+[docs.harton.nz](https://docs.harton.nz/james/gcode).
 
-Documentation for the main branch of this package is always available [on gitlab pages](https://jimsy.gitlab.io/gcode), and released versions are published [on Hexdocs](https://hexdocs.pm/gcode).
+## Github Mirror
 
-## Contributing
-
-This project uses the wonderful [git_ops](https://hex.pm/packages/git_ops) package to automate releases and as such requires the use of [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Feel free to open issues and pull requests.
+This repository is mirrored [on Github](https://github.com/jimsynz/gcode)
+from it's primary location [on my Forejo instance](https://harton.dev/james/gcode).
+Feel free to raise issues and open PRs on Github.
 
 ## License
 
