@@ -26,7 +26,7 @@ Documentation for the latest release can be found on
 ## Github Mirror
 
 This repository is mirrored [on Github](https://github.com/jimsynz/gcode)
-from it's primary location [on my Forejo instance](https://harton.dev/james/gcode).
+from it's primary location [on my Forgejo instance](https://harton.dev/james/gcode).
 Feel free to raise issues and open PRs on Github.
 
 ## License
