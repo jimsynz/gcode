@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v1.0.1](https://harton.dev/james/gcode/compare/v1.0.0...v1.0.1) (2024-12-12)
+
+
+
+
+### Bug Fixes:
+
+* compiler warnings about `else` clauses.
+
 ## [v1.0.0](https://gitlab.com/jimsy/gcode/compare/v0.4.1...v1.0.0) (2023-01-16)
 ### Breaking Changes:
 

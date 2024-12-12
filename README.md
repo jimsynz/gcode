@@ -14,7 +14,7 @@ installed by adding `gcode` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:gcode, "~> 1.0.0"}
+    {:gcode, "~> 1.0.1"}
   ]
 end
 ```

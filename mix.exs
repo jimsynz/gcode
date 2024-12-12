@@ -2,7 +2,7 @@ defmodule Gcode.MixProject do
   use Mix.Project
   @moduledoc false
 
-  @version "1.0.0"
+  @version "1.0.1"
   @description """
   A G-code parser and generator.
   """
