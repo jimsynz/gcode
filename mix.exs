@@ -54,7 +54,7 @@ defmodule Gcode.MixProject do
       # Dev/test
       {:credo, "~> 1.6", only: ~w[dev test]a, runtime: false},
       {:ex_check, "~> 0.15", only: ~w[dev test]a, runtime: false},
-      {:ex_doc, "~> 0.39", only: ~w[dev test]a, runtime: false},
+      {:ex_doc, "~> 0.40", only: ~w[dev test]a, runtime: false},
       {:git_ops, "~> 2.4", only: ~w[dev test]a, runtime: false}
     ]
   end
