@@ -1,4 +1,4 @@
-defimpl Gcode.Model.Serialise, for: Gcode.Model.Expr.List do
+defmodule Gcode.Model.Expr.List.SerialiseTest do
   use ExUnit.Case, async: true
   alias Gcode.Model.{Expr.List, Serialise}
   use Gcode.Result
