@@ -1,6 +1,5 @@
 # G-code
 
-[![Build Status](https://drone.harton.dev/api/badges/james/gcode/status.svg?ref=refs/heads/main)](https://drone.harton.dev/james/gcode)
 [![Hex.pm](https://img.shields.io/hexpm/v/gcode.svg)](https://hex.pm/packages/gcode)
 [![Hippocratic License HL3-FULL](https://img.shields.io/static/v1?label=Hippocratic%20License&message=HL3-FULL&labelColor=5e2751&color=bc8c3d)](https://firstdonoharm.dev/version/3/0/full.html)
 
@@ -20,8 +19,7 @@ end
 ```
 
 Documentation for the latest release can be found on
-[HexDocs](https://hexdocs.pm/gcode) and for the `main` branch on
-[docs.harton.nz](https://docs.harton.nz/james/gcode).
+[HexDocs](https://hexdocs.pm/gcode).
 
 ## Github Mirror
 
