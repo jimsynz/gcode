@@ -6,6 +6,9 @@ defimpl Gcode.Model.Describe, for: Gcode.Model.Program do
   Implements the `Describe` protocol for `Program`.
   """
 
+  @spec describe(Program.t()) :: Option.t(String.t())
+  def describe(program), do: describe(program, [])
+
   @spec describe(Program.t(), options :: []) :: Option.t(String.t())
   def describe(%Program{elements: elements}, options) do
     lines =

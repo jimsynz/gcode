@@ -9,6 +9,10 @@ defimpl Gcode.Model.Describe, for: Gcode.Model.Block do
   """
 
   @doc false
+  @spec describe(Block.t()) :: Option.t(String.t())
+  def describe(block), do: describe(block, [])
+
+  @doc false
   @spec describe(Block.t(), options :: []) :: Option.t(String.t())
   def describe(%Block{words: words, comment: some(comment)}, options) do
     words = describe_words(words, options)

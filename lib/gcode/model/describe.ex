@@ -6,6 +6,9 @@ defprotocol Gcode.Model.Describe do
   A protocol which is used to describe the model for human consumption.
   """
 
+  @spec describe(Describe.t()) :: Option.t(String.t())
+  def describe(describable)
+
   @spec describe(Describe.t(), options :: []) :: Option.t(String.t())
-  def describe(describable, opts \\ [])
+  def describe(describable, opts)
 end

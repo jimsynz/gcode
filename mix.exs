@@ -39,7 +39,6 @@ defmodule Gcode.MixProject do
       links: %{
         "Source" => "https://harton.dev/james/gcode",
         "GitHub" => "https://github.com/jimsynz/gcode",
-        "Changelog" => "https://docs.harton.nz/james/gcode/changelog.html",
         "Sponsor" => "https://github.com/sponsors/jimsynz"
       }
     ]
