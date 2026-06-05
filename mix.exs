@@ -35,7 +35,7 @@ defmodule Gcode.MixProject do
   def package do
     [
       maintainers: ["James Harton <james@harton.nz>"],
-      licenses: ["HL3-FULL"],
+      licenses: ["Apache-2.0"],
       links: %{
         "Source" => "https://harton.dev/james/gcode",
         "GitHub" => "https://github.com/jimsynz/gcode",
