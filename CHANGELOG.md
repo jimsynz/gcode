@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v1.0.2](https://harton.dev/james/gcode/compare/v1.0.1...v1.0.2) (2026-06-05)
+
+
+
+
+### Bug Fixes:
+
+* replace deprecated protocol default argument in `Describe` by James Harton
+
 ## [v1.0.1](https://harton.dev/james/gcode/compare/v1.0.0...v1.0.1) (2024-12-12)
 
 
